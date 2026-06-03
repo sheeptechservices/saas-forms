@@ -4,7 +4,7 @@ import { useState, useRef, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { FileUpload } from "./file-upload";
 import type { FileAttachment } from "@/app/actions";
-import { useForm } from "react-hook-form";
+import { useForm, type FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { sdrFormSchema, type SdrFormData, STEPS } from "@/lib/schema";
 import { submitSdrForm } from "@/app/actions";
@@ -56,6 +56,7 @@ export function SdrForm() {
   const [phase, setPhase] = useState<"form" | "submitting" | "success">("form");
   const [serverError, setServerError] = useState<string | null>(null);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+  const [stepsWithErrors, setStepsWithErrors] = useState<number[]>([]);
 
   const {
     register,
@@ -89,6 +90,7 @@ export function SdrForm() {
   async function goNext() {
     const valid = await trigger([...currentStep.campos] as (keyof SdrFormData)[]);
     if (!valid) return;
+    setStepsWithErrors((prev) => prev.filter((s) => s !== step));
     setDirection(1);
     setStep((s) => Math.min(s + 1, STEPS.length));
   }
@@ -96,6 +98,19 @@ export function SdrForm() {
   function goPrev() {
     setDirection(-1);
     setStep((s) => Math.max(s - 1, 1));
+  }
+
+  function onValidationError(errors: FieldErrors<SdrFormData>) {
+    const errorFields = Object.keys(errors);
+    const affected: number[] = STEPS
+      .filter((s) => (s.campos as readonly string[]).some((c) => errorFields.includes(c)))
+      .map((s) => s.id);
+    setStepsWithErrors(affected);
+    if (affected.length > 0 && !affected.includes(step)) {
+      const target = affected[0];
+      setDirection(target < step ? -1 : 1);
+      setStep(target);
+    }
   }
 
   async function onSubmit(data: SdrFormData) {
@@ -333,7 +348,7 @@ export function SdrForm() {
             <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
               <motion.div
                 onClick={() => { setDirection(s.id > step ? 1 : -1); setStep(s.id); }}
-                className={`h-9 w-9 sm:h-8 sm:w-8 rounded-full flex items-center justify-center text-xs font-bold cursor-pointer transition-colors duration-300 ${
+                className={`relative h-9 w-9 sm:h-8 sm:w-8 rounded-full flex items-center justify-center text-xs font-bold cursor-pointer transition-colors duration-300 ${
                   s.id < step
                     ? "bg-[#AAFF00] text-black"
                     : s.id === step
@@ -352,6 +367,14 @@ export function SdrForm() {
                     transition={{ type: "spring", stiffness: 300 }}
                   >✓</motion.span>
                 ) : s.id}
+                {stepsWithErrors.includes(s.id) && s.id !== step && (
+                  <motion.span
+                    className="absolute -top-0.5 -right-0.5 h-3 w-3 rounded-full bg-red-500 border-2 border-[#080808]"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 400 }}
+                  />
+                )}
               </motion.div>
               <span
                 onClick={() => { setDirection(s.id > step ? 1 : -1); setStep(s.id); }}
@@ -399,7 +422,7 @@ export function SdrForm() {
 
         {/* Corpo do form */}
         <div className="px-5 pb-5 pt-4 sm:px-8 sm:pb-8 sm:pt-6 overflow-hidden">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-5">
+          <form onSubmit={handleSubmit(onSubmit, onValidationError)} className="space-y-4 sm:space-y-5">
             <AnimatePresence mode="wait" custom={direction}>
             <motion.div
               key={step}
@@ -729,6 +752,32 @@ export function SdrForm() {
                   <FileUpload onChange={setAttachedFiles} />
                 </div>
               </>
+            )}
+
+            {stepsWithErrors.length > 0 && (
+              <AnimatePresence>
+                <motion.div
+                  className="flex flex-wrap items-center gap-2 bg-red-50 border border-red-100 rounded-xl px-4 py-3"
+                  initial={{ opacity: 0, y: -6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <span className="text-sm text-red-600 font-medium">Campos obrigatórios pendentes nas etapas:</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {stepsWithErrors.map((id) => (
+                      <button
+                        key={id}
+                        type="button"
+                        onClick={() => { setDirection(id < step ? -1 : 1); setStep(id); }}
+                        className="text-xs font-bold px-2.5 py-1 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
+                      >
+                        Etapa {id} — {STEPS[id - 1].titulo}
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              </AnimatePresence>
             )}
 
             {serverError && (
