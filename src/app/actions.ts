@@ -82,12 +82,12 @@ export interface FileAttachment {
 }
 
 export async function submitSdrForm(data: SdrFormData, attachments: FileAttachment[] = []) {
-  const parsed = sdrFormSchema.safeParse(data);
-  if (!parsed.success) {
-    return { success: false, error: "Dados inválidos. Verifique os campos e tente novamente." };
-  }
-
   try {
+    const parsed = sdrFormSchema.safeParse(data);
+    if (!parsed.success) {
+      return { success: false, error: "Dados inválidos. Verifique os campos e tente novamente." };
+    }
+
     await initDb();
     const db = getDb();
     const d = parsed.data;
@@ -133,7 +133,6 @@ export async function submitSdrForm(data: SdrFormData, attachments: FileAttachme
       });
     }
 
-    // Envia notificação por email (falha silenciosa — não bloqueia o sucesso)
     sendEmailNotification(d, attachments.length).catch((e) =>
       console.error("EmailJS falhou:", e)
     );
@@ -141,6 +140,7 @@ export async function submitSdrForm(data: SdrFormData, attachments: FileAttachme
     return { success: true };
   } catch (err) {
     console.error("Erro ao salvar submission:", err);
-    return { success: false, error: "Erro ao salvar. Tente novamente em instantes." };
+    const msg = err instanceof Error ? err.message : String(err);
+    return { success: false, error: `Erro ao salvar: ${msg}` };
   }
 }

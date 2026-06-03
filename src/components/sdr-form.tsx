@@ -168,7 +168,8 @@ export function SdrForm() {
       }
     } catch (err) {
       console.error("Erro ao submeter formulário:", err);
-      setServerError("Erro de conexão. Verifique sua internet e tente novamente.");
+      const msg = err instanceof Error ? err.message : String(err);
+      setServerError(`Erro ao enviar: ${msg}`);
       setPhase("form");
     }
   }
