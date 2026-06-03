@@ -139,30 +139,36 @@ export function SdrForm() {
     setServerError(null);
     setPhase("submitting");
 
-    const attachments: FileAttachment[] = await Promise.all(
-      attachedFiles.map(
-        (file) =>
-          new Promise<FileAttachment>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () =>
-              resolve({
-                name: file.name,
-                type: file.type,
-                size: file.size,
-                data: (reader.result as string).split(",")[1],
-              });
-            reader.onerror = reject;
-            reader.readAsDataURL(file);
-          })
-      )
-    );
+    try {
+      const attachments: FileAttachment[] = await Promise.all(
+        attachedFiles.map(
+          (file) =>
+            new Promise<FileAttachment>((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () =>
+                resolve({
+                  name: file.name,
+                  type: file.type,
+                  size: file.size,
+                  data: (reader.result as string).split(",")[1],
+                });
+              reader.onerror = reject;
+              reader.readAsDataURL(file);
+            })
+        )
+      );
 
-    const result = await submitSdrForm(data, attachments);
-    if (result.success) {
-      try { localStorage.removeItem("sheep_sdr_draft"); } catch {}
-      setPhase("success");
-    } else {
-      setServerError(result.error ?? "Erro desconhecido.");
+      const result = await submitSdrForm(data, attachments);
+      if (result.success) {
+        try { localStorage.removeItem("sheep_sdr_draft"); } catch {}
+        setPhase("success");
+      } else {
+        setServerError(result.error ?? "Erro desconhecido.");
+        setPhase("form");
+      }
+    } catch (err) {
+      console.error("Erro ao submeter formulário:", err);
+      setServerError("Erro de conexão. Verifique sua internet e tente novamente.");
       setPhase("form");
     }
   }
