@@ -785,32 +785,6 @@ export function SdrForm() {
               </>
             )}
 
-            {stepsWithErrors.length > 0 && (
-              <AnimatePresence>
-                <motion.div
-                  className="flex flex-wrap items-center gap-2 bg-red-50 border border-red-100 rounded-xl px-4 py-3"
-                  initial={{ opacity: 0, y: -6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <span className="text-sm text-red-600 font-medium">Campos obrigatórios pendentes nas etapas:</span>
-                  <div className="flex flex-wrap gap-1.5">
-                    {stepsWithErrors.map((id) => (
-                      <button
-                        key={id}
-                        type="button"
-                        onClick={() => { setDirection(id < step ? -1 : 1); setStep(id); }}
-                        className="text-xs font-bold px-2.5 py-1 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
-                      >
-                        Etapa {id} — {STEPS[id - 1].titulo}
-                      </button>
-                    ))}
-                  </div>
-                </motion.div>
-              </AnimatePresence>
-            )}
-
             {serverError && (
               <p className="text-sm text-red-600 bg-red-50 rounded-xl px-4 py-3 border border-red-100">
                 {serverError}
@@ -820,7 +794,33 @@ export function SdrForm() {
             </AnimatePresence>
 
             {/* Navegação */}
-            <div className="flex justify-between items-center pt-4 sm:pt-6">
+            <div className="flex flex-col gap-3 pt-4 sm:pt-6">
+            <AnimatePresence>
+            {stepsWithErrors.length > 0 && (
+              <motion.div
+                className="flex flex-wrap items-center gap-2 bg-red-50 border border-red-100 rounded-xl px-4 py-3"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 6 }}
+                transition={{ duration: 0.2 }}
+              >
+                <span className="text-sm text-red-600 font-medium">Campos pendentes:</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {stepsWithErrors.map((id) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => { setDirection(id < step ? -1 : 1); setStep(id); }}
+                      className="text-xs font-bold px-2.5 py-1 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
+                    >
+                      Etapa {id} — {STEPS[id - 1].titulo}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+            </AnimatePresence>
+            <div className="flex justify-between items-center">
               <motion.button
                 type="button"
                 onClick={goPrev}
@@ -870,6 +870,7 @@ export function SdrForm() {
                   )}
                 </motion.button>
               )}
+            </div>
             </div>
           </form>
         </div>
