@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { FileUpload } from "./file-upload";
 import type { FileAttachment } from "@/app/actions";
@@ -64,6 +64,7 @@ export function SdrForm() {
     setValue,
     trigger,
     reset,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<SdrFormData>({
     resolver: zodResolver(sdrFormSchema),
@@ -83,6 +84,27 @@ export function SdrForm() {
       meta_conversao: "", prazo_desejado: "", observacoes: "",
     },
   });
+
+  const watchedValues = watch();
+
+  // Restore draft from localStorage on first mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("sheep_sdr_draft");
+      if (!saved) return;
+      const { data, step: savedStep } = JSON.parse(saved);
+      if (data) reset(data);
+      if (typeof savedStep === "number") setStep(savedStep);
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Persist draft on every change
+  useEffect(() => {
+    try {
+      localStorage.setItem("sheep_sdr_draft", JSON.stringify({ data: watchedValues, step }));
+    } catch {}
+  }, [watchedValues, step]);
 
   const currentStep = STEPS[step - 1];
   const progress = (step / STEPS.length) * 100;
@@ -137,6 +159,7 @@ export function SdrForm() {
 
     const result = await submitSdrForm(data, attachments);
     if (result.success) {
+      try { localStorage.removeItem("sheep_sdr_draft"); } catch {}
       setPhase("success");
     } else {
       setServerError(result.error ?? "Erro desconhecido.");
@@ -462,6 +485,7 @@ export function SdrForm() {
                   <SimpleSelect
                     placeholder="Selecione uma faixa"
                     options={TICKET_OPTIONS}
+                    value={watchedValues.ticket_medio}
                     onSelect={(v) => setValue("ticket_medio", v)}
                   />
                 </Field>
@@ -495,6 +519,7 @@ export function SdrForm() {
                   <SimpleSelect
                     placeholder="Selecione"
                     options={GENERO_OPTIONS}
+                    value={watchedValues.genero_persona}
                     onSelect={(v) => setValue("genero_persona", v)}
                   />
                 </Field>
@@ -508,6 +533,7 @@ export function SdrForm() {
                   <SimpleSelect
                     placeholder="Selecione"
                     options={TRATAMENTO_OPTIONS}
+                    value={watchedValues.forma_tratamento}
                     onSelect={(v) => setValue("forma_tratamento", v)}
                   />
                 </Field>
@@ -536,6 +562,7 @@ export function SdrForm() {
                     <SimpleSelect
                       placeholder="Selecione"
                       options={FORMALIDADE_OPTIONS}
+                      value={watchedValues.formalidade}
                       onSelect={(v) => setValue("formalidade", v)}
                     />
                   </Field>
@@ -543,6 +570,7 @@ export function SdrForm() {
                     <SimpleSelect
                       placeholder="Selecione"
                       options={EMPATIA_OPTIONS}
+                      value={watchedValues.nivel_empatia}
                       onSelect={(v) => setValue("nivel_empatia", v)}
                     />
                   </Field>
@@ -550,6 +578,7 @@ export function SdrForm() {
                     <SimpleSelect
                       placeholder="Selecione"
                       options={HUMOR_OPTIONS}
+                      value={watchedValues.uso_humor}
                       onSelect={(v) => setValue("uso_humor", v)}
                     />
                   </Field>
@@ -557,6 +586,7 @@ export function SdrForm() {
                     <SimpleSelect
                       placeholder="Selecione"
                       options={TAMANHO_OPTIONS}
+                      value={watchedValues.tamanho_respostas}
                       onSelect={(v) => setValue("tamanho_respostas", v)}
                     />
                   </Field>
@@ -564,6 +594,7 @@ export function SdrForm() {
                     <SimpleSelect
                       placeholder="Selecione"
                       options={EMOJIS_OPTIONS}
+                      value={watchedValues.uso_emojis}
                       onSelect={(v) => setValue("uso_emojis", v)}
                     />
                   </Field>
@@ -876,13 +907,15 @@ function SimpleSelect({
   placeholder,
   options,
   onSelect,
+  value,
 }: {
   placeholder: string;
   options: string[];
   onSelect: (v: string) => void;
+  value?: string;
 }) {
   return (
-    <Select onValueChange={(v: string | null) => { if (v) onSelect(v); }}>
+    <Select value={value ?? ""} onValueChange={(v: string | null) => { if (v) onSelect(v); }}>
       <SelectTrigger>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
