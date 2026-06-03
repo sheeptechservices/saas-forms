@@ -133,8 +133,8 @@ export async function submitSdrForm(data: SdrFormData, attachments: FileAttachme
       });
     }
 
-    sendEmailNotification(d, attachments.length).catch((e) =>
-      console.error("EmailJS falhou:", e)
+    await sendEmailNotification(d, attachments.length).catch((e) =>
+      console.error("Email falhou:", e)
     );
 
     return { success: true };
