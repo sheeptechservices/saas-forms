@@ -20,8 +20,8 @@ async function sendEmailNotification(d: SdrFormData, numAnexos: number) {
   const { error } = await resend.emails.send({
     // Após verificar o domínio em resend.com/domains, troque pelo seu:
     // from: "SDR Formulário <noreply@sheeptechnology.com.br>",
-    from: "SDR Formulário <onboarding@resend.dev>",
-    to: toEmail,
+    from: "SDR Formulário <noreply@sheeptechnology.com.br>",
+    to: "assinaturas@sheeptechnology.com.br",
     replyTo: d.email_responsavel,
     subject: `🐑 Novo formulário SDR — ${d.nome_empresa}`,
     html: `<!DOCTYPE html>
