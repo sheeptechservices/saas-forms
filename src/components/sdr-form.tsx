@@ -429,62 +429,6 @@ export function SdrForm() {
         ))}
       </div>
 
-      {/* Botão de teste rápido */}
-      <div className="flex justify-end px-1">
-        <button
-          type="button"
-          onClick={() => {
-            reset({
-              nome_empresa: "Shark Soluções",
-              segmento: "Consultoria de Vendas B2B",
-              site_ou_instagram: "https://sharksolutions.com.br",
-              produto_servico: "Consultoria especializada em vendas B2B para aumentar a taxa de conversão de leads qualificados",
-              ticket_medio: "R$ 2.000 – R$ 10.000",
-              descricao_icp: "Donos de PMEs com 10 a 50 funcionários que querem escalar vendas sem contratar mais vendedores",
-              principais_dores: "Baixa taxa de conversão, time sobrecarregado, leads sem qualificação",
-              nome_persona: "Ana",
-              genero_persona: "Feminino",
-              cargo_persona: "Consultora de Vendas",
-              forma_tratamento: "Você (informal)",
-              frase_abertura: "Olá! Sou a Ana, consultora virtual da Shark Soluções. Como posso te ajudar hoje?",
-              frase_encerramento: "Foi um prazer te atender! Qualquer dúvida, estou por aqui. Até logo!",
-              formalidade: "Semi-formal",
-              nivel_empatia: "Alto",
-              uso_humor: "Leve",
-              tamanho_respostas: "Médio (3–5 linhas)",
-              uso_emojis: "Moderado (apenas pontos-chave)",
-              palavras_deve_usar: "solução, resultado, economia, exclusivo, personalizado",
-              palavras_nunca_usar: "problema, impossível, caro, difícil",
-              reacao_reclamacoes: "Lamento muito pelo ocorrido. Vou encaminhar para nossa equipe resolver o mais rápido possível.",
-              fora_do_escopo: "Ainda não consigo te ajudar com isso por aqui, mas posso te conectar com nossa equipe.",
-              o_que_sabe_fazer: "Tirar dúvidas sobre o produto, qualificar leads, agendar demonstrações, enviar proposta",
-              o_que_nao_faz: "Não dá descontos sem autorização, não faz promessas de prazo",
-              destinos_disponiveis: "D01 – Lead qualificado: agendar reunião com vendedor\nD02 – Lead desqualificado: encerrar com gentileza\nD03 – Dúvida complexa: transferir para atendente humano",
-              criterios_qualificacao: "Lead qualificado = interesse real + pode decidir + budget compatível + quer resolver em 30 dias",
-              perguntas_confirmacao: "Você já tem orçamento definido?\nQuem mais participa dessa decisão?\nQual é o maior desafio hoje?",
-              gatilhos_criticos: "quero cancelar, fui enganado, vou processar, já comprei de outro",
-              quando_escalar_humano: "Cliente em crise emocional\nReclamação com reembolso\nDúvida técnica complexa\nPediu explicitamente por humano",
-              horario_atendimento_humano: "Segunda a sexta, 8h às 18h",
-              mensagem_fora_horario: "No momento não temos atendentes disponíveis. Retornaremos no próximo dia útil!",
-              canal_escalada: "WhatsApp (11) 99999-9999",
-              exemplos_interacao: "",
-              nome_responsavel: "Guilherme Zaidan",
-              email_responsavel: "guilhermezaidan@wearedux.com",
-              telefone: "(11) 99999-9999",
-              meta_conversao: "",
-              prazo_desejado: "",
-              observacoes: "",
-            });
-            setStepsWithErrors([]);
-            setDirection(1);
-            setStep(6);
-          }}
-          className="text-[10px] font-semibold text-white/20 hover:text-white/50 transition-colors px-2 py-1"
-        >
-          preencher teste
-        </button>
-      </div>
-
       {/* Card principal */}
       <div className="card-glow bg-white rounded-3xl overflow-hidden" style={{ boxShadow: "0 25px 80px rgba(0,0,0,0.5), 0 0 60px rgba(170,255,0,0.07)" }}>
         {/* Cabeçalho do card */}

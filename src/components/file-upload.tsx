@@ -12,7 +12,7 @@ interface Props {
 }
 
 const MAX_FILES = 5;
-const MAX_MB = 3;
+const MAX_MB = 5;
 const MAX_BYTES = MAX_MB * 1024 * 1024;
 const ACCEPT = ".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.xls,.xlsx,.csv";
 
